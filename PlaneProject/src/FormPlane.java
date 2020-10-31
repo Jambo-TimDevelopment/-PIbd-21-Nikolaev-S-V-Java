@@ -1,3 +1,7 @@
+import Plane.BasePlane;
+import Plane.Direction;
+import Plane.RadarPlane;
+
 import java.awt.Color;
 import java.awt.EventQueue;
 
@@ -9,7 +13,7 @@ import java.awt.event.ActionEvent;
 public class FormPlane {
 
     private JFrame frame;
-    private Plane plane;
+    private BasePlane basePlane;
     PlanePanel panel;
 
     /**
@@ -34,8 +38,6 @@ public class FormPlane {
      */
     public FormPlane() {
         initialize();
-
-        Random rnd = new Random();
     }
 
     /**
@@ -50,7 +52,7 @@ public class FormPlane {
         JButton MoveUpBut = new JButton("");
         MoveUpBut.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                plane.MoveTransport(Direction.Up);
+                basePlane.MoveTransport(Direction.Up);
                 panel.repaint();
             }
         });
@@ -62,7 +64,7 @@ public class FormPlane {
         JButton MoveDownBut = new JButton("");
         MoveDownBut.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                plane.MoveTransport(Direction.Down);
+                basePlane.MoveTransport(Direction.Down);
                 panel.repaint();
             }
         });
@@ -74,7 +76,7 @@ public class FormPlane {
         JButton MoveLeftBut = new JButton("");
         MoveLeftBut.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                plane.MoveTransport(Direction.Left);
+                basePlane.MoveTransport(Direction.Left);
                 panel.repaint();
             }
         });
@@ -86,7 +88,7 @@ public class FormPlane {
         JButton MoveRightBut = new JButton("");
         MoveRightBut.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                plane.MoveTransport(Direction.Right);
+                basePlane.MoveTransport(Direction.Right);
                 panel.repaint();
             }
         });
@@ -95,24 +97,51 @@ public class FormPlane {
         MoveRightBut.setBounds(666, 429, 38, 23);
         frame.getContentPane().add(MoveRightBut);
 
-        panel = new PlanePanel(plane);
+        panel = new PlanePanel(basePlane);
         panel.setBounds(40, 40, 660, 363);
         frame.getContentPane().add(panel);
 
-        JButton CreateObjectBut = new JButton("Create");
-        CreateObjectBut.addActionListener(new ActionListener() {
+        JButton CreatePlaneBut = new JButton("Create plane");
+        CreatePlaneBut.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Random rnd = new Random();
                 Color mainColor =  Color.GRAY;
                 Color dopColor = new Color(0,0,0);
-                plane = new Plane(rnd.nextInt() % 200 + 100, (float)(rnd.nextInt() % 1000 + 1000), mainColor,
-                        dopColor, rnd.nextInt() % 3 + 1, true);
-                plane.SetPosition(rnd.nextInt() % 90 + 70, rnd.nextInt() % 90 + 90, panel.getWidth(), panel.getHeight());
-                panel.setPlane(plane);
+                boolean antenna = true;
+                basePlane = new BasePlane(
+                        rnd.nextInt() % 200 + 100,
+                        (float)(rnd.nextInt() % 1000 + 1000),
+                        mainColor
+                        );
+                basePlane.SetPosition(rnd.nextInt() % 90 + 100, rnd.nextInt() % 90 + 100, panel.getWidth(), panel.getHeight());
+                panel.setPlane(basePlane);
                 panel.repaint();
             }
         });
-        CreateObjectBut.setBounds(40, 10, 89, 23);
-        frame.getContentPane().add(CreateObjectBut);
+        CreatePlaneBut.setBounds(40, 10, 150, 23);
+        frame.getContentPane().add(CreatePlaneBut);
+
+        JButton CreateRadarPlaneBut = new JButton("Create radar plane");
+        CreateRadarPlaneBut.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Random rnd = new Random();
+                Color mainColor =  Color.GRAY;
+                Color dopColor = new Color(0,0,0);
+                int countRadar = rnd.nextInt() % 3 + 1;
+                boolean antenna = true;
+                basePlane = new RadarPlane(
+                        rnd.nextInt() % 200 + 100,
+                        (float)(rnd.nextInt() % 1000 + 1000),
+                        mainColor,
+                        dopColor,
+                        countRadar,
+                        antenna);
+                basePlane.SetPosition(rnd.nextInt() % 90 + 100, rnd.nextInt() % 90 + 100, panel.getWidth(), panel.getHeight());
+                panel.setPlane(basePlane);
+                panel.repaint();
+            }
+        });
+        CreateRadarPlaneBut.setBounds(200, 10, 150, 23);
+        frame.getContentPane().add(CreateRadarPlaneBut);
     }
 }
