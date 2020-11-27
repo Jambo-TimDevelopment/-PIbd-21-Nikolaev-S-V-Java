@@ -7,10 +7,8 @@ import static Radar.TypeRadar.*;
 public class RadarDefault implements IRadar {
 
     protected TypeRadar typeRadar;
-    public int CountRadars;
 
     public RadarDefault(int countRadars){
-        countRadars = countRadars;
         typeRadar = createTypeRadar(countRadars);
     }
 
