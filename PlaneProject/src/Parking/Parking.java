@@ -1,13 +1,15 @@
 package Parking;
 
+import Plane.APlane;
 import Plane.IPlane;
 import Radar.IRadar;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Parking<T extends IPlane, V extends IRadar>  {
 
-    private T[] _places;
+    public ArrayList<T> _places;
 
     private int pictureWidth;
 
@@ -17,50 +19,42 @@ public class Parking<T extends IPlane, V extends IRadar>  {
 
     private int _placeSizeHeight = 130;
 
+    private int _maxCount = 6;
+
     public Parking(int picWidth, int picHeight)
     {
         int width = picWidth / _placeSizeWidth;
         int height = picHeight / _placeSizeHeight;
-        _places = (T[]) new IPlane[width * height];
+        _places = new ArrayList<T>();
         pictureWidth = picWidth;
         pictureHeight = picHeight;
     }
 
     public boolean addPlane(T plane)
     {
-        for (int i = 0; i < this._places.length; i++)
-        {
-            if (this._places[i] == null)
-            {
-                this._places[i] = plane;
-                this._places[i].SetPosition((i / 3) * 270, 5 + (i % 3) * 127, this.pictureWidth, this.pictureHeight);
-                return true;
-            }
+        if (_places.size() >= _maxCount) {
+            return false;
         }
-        return false;
+        _places.add( plane );
+        return true;
     }
 
     public T takePLane(int index)
     {
-        if (this._places[index] != null)
-        {
-            T tmp = this._places[index];
-            this._places[index] = null;
-            return tmp;
-        }
-        else
-        {
+        if (index >= _places.size() || index < 0) {
             return null;
         }
+        return _places.get( index );
     }
 
     public void Draw(Graphics g)
     {
         DrawParking(g);
-        for (int i = 0; i < _places.length; i++)
-        {
-            if(_places[i] != null){
-                _places[i].DrawTransport(g);
+        for (int i = 0; i < _places.size(); i++) {
+            if (_places.get( i ) != null) {
+                _places.get( i ).SetPosition( 5 + i / 3 * _placeSizeWidth + 5, i % 3 *
+                        _placeSizeHeight + 15, pictureWidth, pictureHeight );
+                _places.get( i ).DrawTransport( g );
             }
         }
     }
@@ -82,14 +76,25 @@ public class Parking<T extends IPlane, V extends IRadar>  {
     }
 
     public int countPlaceParking(){
-        return _places.length;
+        return _places.size();
     }
 
     public boolean isMore(Parking otherParking){
-        return  _places.length > otherParking.countPlaceParking();
+        return  _places.size() > otherParking.countPlaceParking();
     }
 
     public boolean isSmaller(Parking otherParking){
-        return  _places.length < otherParking.countPlaceParking();
+        return  _places.size() < otherParking.countPlaceParking();
+    }
+
+    public T get(int index) {
+        if (index >= _places.size() || index < 0) {
+            return null;
+        }
+        return _places.get(index);
+    }
+
+    public void removePlane(int index){
+        _places.remove(index);
     }
 }

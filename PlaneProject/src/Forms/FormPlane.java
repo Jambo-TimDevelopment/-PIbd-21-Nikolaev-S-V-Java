@@ -4,7 +4,7 @@ import Plane.BasePlane;
 import Plane.Direction;
 import Plane.RadarPlane;
 
-import java.awt.Color;
+import java.awt.*;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -16,12 +16,14 @@ public class FormPlane {
     public JFrame frame;
     private BasePlane plane;
     private PlanePanel planePanel;
+    private Frame parentFrame;
 
     /**
      * Create the application.
      */
-    public FormPlane() {
+    public FormPlane(Frame parentFrame) {
         initialize();
+        this.parentFrame = parentFrame;
     }
 
     /**
@@ -84,6 +86,18 @@ public class FormPlane {
         planePanel = new PlanePanel(plane);
         planePanel.setBounds(40, 40, 660, 363);
         frame.getContentPane().add(planePanel);
+
+        JButton btnBack;
+        btnBack = new JButton( "На парковку!" );
+        btnBack.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                parentFrame.setVisible( true );
+                frame.setVisible( false );
+            }
+        } );
+
+        btnBack.setBounds( 400, 430, 156, 35 );
+        frame.getContentPane().add( btnBack );
     }
 
     public void setPlane(BasePlane plane){
