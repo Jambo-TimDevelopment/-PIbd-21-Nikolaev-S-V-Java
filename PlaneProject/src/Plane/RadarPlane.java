@@ -11,15 +11,11 @@ import java.util.Random;
 
 public class RadarPlane extends BasePlane {
 
-    public RadarDefault Radar;
-
     public boolean Antenna;
 
     private IRadar radar;
 
     public Color DopColor;
-
-    private int countRadar;
 
     public RadarPlane(int maxSpeed,
                       float weight,
@@ -28,7 +24,6 @@ public class RadarPlane extends BasePlane {
                       int countRadar,
                       boolean antenna) {
         super(maxSpeed, weight, mainColor);
-        countRadar = countRadar;
         Random rnd = new Random();
         int randomTypeRadar = rnd.nextInt() % 3;
         if(randomTypeRadar == 0){
@@ -53,7 +48,7 @@ public class RadarPlane extends BasePlane {
         if(radar != null){
             radar.DrawElement(g, (int)_startPosX, (int)_startPosY);
         }else{
-            radar = new RadarDefault(countRadar);
+            radar = new RadarDefault(2);
             radar.DrawElement(g, (int)_startPosX, (int)_startPosY);
         }
     }

@@ -3,7 +3,7 @@ package Radar;
 import java.awt.*;
 
 public interface  IRadar {
-    TypeRadar typeRadar = null;
+    public TypeRadar typeRadar = null;
 
     void setTypeRadar(int countRadar);
 

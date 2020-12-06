@@ -2,9 +2,6 @@ package Radar;
 
 import java.awt.*;
 
-import static Radar.TypeRadar.*;
-import static Radar.TypeRadar.COUNT_1;
-
 public class RadarOval extends RadarDefault {
 
 
