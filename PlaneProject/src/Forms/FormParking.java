@@ -2,6 +2,7 @@ package Forms;
 
 import Parking.ParkingCollection;
 import Parking.Parking;
+import Plane.APlane;
 import Plane.BasePlane;
 import Plane.IPlane;
 import Plane.RadarPlane;
@@ -21,6 +22,7 @@ public class FormParking {
     private JTextField textFieldGetPlace;
     private JButton btnTakeLastPlane;
     private Parking<IPlane, IRadar> planeParking;
+    ParkingPanel panel = new ParkingPanel();
 
     private ParkingCollection collectionParking;
     private JList<String> jListOfParking;
@@ -63,7 +65,6 @@ public class FormParking {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
-        ParkingPanel panel = new ParkingPanel();
         panel.setBounds(0, 0, 700, 500);
         frame.getContentPane().add(panel);
         planeParking = new Parking(panel.getWidth(), panel.getHeight());
@@ -151,30 +152,32 @@ public class FormParking {
         deleteStationButton.setBounds(width, 180, 200, 20);
         frame.add(deleteStationButton);
 
-
         JButton btnParkingBasePlane = new JButton("Припарковать самолет");
         btnParkingBasePlane.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (jListOfParking.getSelectedIndex() > -1) {
-                    Color mainColor = JColorChooser.showDialog(frame, "Выберите цвет самолета", Color.BLUE);
-                    if (mainColor != null) {
-                        BasePlane plane = new BasePlane(100, 1000, mainColor);
-                        if (collectionParking.get(listParking.get(jListOfParking.getSelectedIndex())).addPlane(plane)) {
-                            panel.repaint();
-                        } else {
-                            JOptionPane.showMessageDialog(frame, "Гавань переполнена", "Сообщение", JOptionPane.INFORMATION_MESSAGE);
-                        }
-                        //panel.repaint();
-                    }
-                } else
-                    JOptionPane.showMessageDialog(frame, "Нет гавани для парковки", "Сообщение", JOptionPane.INFORMATION_MESSAGE);
+                try {
+                    FormPlaneConfig newFrame = new FormPlaneConfig(frame);
+                    newFrame.addEvent(this::addPlane);
+                    newFrame.frame.setVisible(true);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
 
+            private void addPlane(APlane aPlane) {
+                if (aPlane != null && jListOfParking.getSelectedIndex() > -1) {
+                    if (collectionParking.get(listParking.get(jListOfParking.getSelectedIndex())).addPlane(aPlane)) {
+                        panel.repaint();
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Самолет не удалось поставить");
+                    }
+                }
             }
         });
         btnParkingBasePlane.setBounds(720, 216, 250, 30);
         frame.getContentPane().add(btnParkingBasePlane);
 
-        JButton btnParkingRadarPlane = new JButton("Припарковать самолет с радаром");
+       /* JButton btnParkingRadarPlane = new JButton("Припарковать самолет с радаром");
         btnParkingRadarPlane.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (jListOfParking.getSelectedIndex() > -1) {
@@ -206,6 +209,7 @@ public class FormParking {
         });
         btnParkingRadarPlane.setBounds(720, 253, 250, 30);
         frame.getContentPane().add(btnParkingRadarPlane);
+        */
 
         textFieldGetPlace = new JTextField();
         textFieldGetPlace.setBounds(830, 299, 84, 26);
