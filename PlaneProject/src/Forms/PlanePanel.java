@@ -16,6 +16,10 @@ public class PlanePanel extends JPanel {
         this.setBackground(backgroundColor);
     }
 
+    public PlanePanel() {
+
+    }
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);

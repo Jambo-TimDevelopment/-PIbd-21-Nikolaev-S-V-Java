@@ -95,6 +95,8 @@ public class Parking<T extends IPlane, V extends IRadar>  {
     }
 
     public void removePlane(int index){
-        _places.remove(index);
+        if(_places.size() > index) {
+            _places.remove(index);
+        }
     }
 }
