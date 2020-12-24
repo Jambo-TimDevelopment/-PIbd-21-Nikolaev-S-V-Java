@@ -13,6 +13,10 @@ public class RadarPlane extends BasePlane {
 
     private boolean haveRadar;
 
+    private int typeRadar;
+
+    private int countRadar;
+
     private IRadar radar;
 
     public Color DopColor;
@@ -25,6 +29,9 @@ public class RadarPlane extends BasePlane {
                       int countRadar,
                       boolean antenna) {
         super(maxSpeed, weight, mainColor);
+        DopColor = dopColor;
+        this.typeRadar = typeRadar;
+        this.countRadar = countRadar;
         if (typeRadar == 0) {
             radar = new RadarDefault(countRadar, DopColor);
         } else if (typeRadar == 1) {
@@ -33,7 +40,6 @@ public class RadarPlane extends BasePlane {
             radar = new RadarOval(countRadar, DopColor);
         }
         Antenna = antenna;
-        DopColor = dopColor;
     }
 
     public RadarPlane(int maxSpeed,
@@ -55,6 +61,25 @@ public class RadarPlane extends BasePlane {
         }
         Antenna = antenna;
         DopColor = dopColor;
+    }
+
+    public RadarPlane(String s) {
+        super(Integer.parseInt(s.split(separator)[0]), Float.parseFloat(s.split(separator)[1]), Color.decode(s.split(separator)[2]));
+        String[] info = s.split(separator);
+        if (info.length == 8) {
+            DopColor = Color.decode(info[3]);
+            haveRadar = Boolean.parseBoolean(info[4]);
+            int typeRadar = Integer.parseInt(info[5]);
+            int countRadar = Integer.parseInt(info[6]);
+            Antenna = Boolean.parseBoolean(info[7]);
+            if (typeRadar == 0) {
+                radar = new RadarDefault(countRadar, DopColor);
+            } else if (typeRadar == 1) {
+                radar = new RadarSquare(countRadar, DopColor);
+            } else if (typeRadar == 2) {
+                radar = new RadarOval(countRadar, DopColor);
+            }
+        }
     }
 
     @Override
@@ -82,5 +107,15 @@ public class RadarPlane extends BasePlane {
 
     public void setRadar(IRadar radar) {
         this.radar = radar;
+    }
+
+    @Override
+    public String toString(){
+        return super.toString() + separator
+                + DopColor.getRGB() + separator
+                + haveRadar + separator
+                + typeRadar + separator
+                + countRadar + separator
+                + Antenna + separator;
     }
 }

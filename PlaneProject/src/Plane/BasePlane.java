@@ -13,10 +13,21 @@ public class BasePlane extends APlane {
 
     private int planeHeight = 120;
 
+    static protected String separator = ";";
+
     public BasePlane(int maxSpeed, float weight, Color mainColor) {
         MaxSpeed = maxSpeed;
         Weight = weight;
         MainColor = mainColor;
+    }
+
+    public BasePlane(String s) {
+        String[] str = s.split(separator);
+        if (str.length == 3) {
+            MaxSpeed = Integer.parseInt(str[0]);
+            Weight = Float.parseFloat(str[1]);
+            MainColor = Color.decode(str[2]);
+        }
     }
 
     public void SetPosition(int x, int y, int width, int height) {
@@ -71,5 +82,10 @@ public class BasePlane extends APlane {
         g.fillRect((int)_startPosX + 10, (int)_startPosY + 50, 100, 20);
         g.fillOval((int)_startPosX + 10, (int)_startPosY + 30, 20, 60);
         g.fillOval((int)_startPosX + 70, (int)_startPosY, 20, 120);
+    }
+
+    @Override
+    public String toString(){
+        return getMaxSpeed() + separator + getWeight() + separator + getMainColor().getRGB();
     }
 }

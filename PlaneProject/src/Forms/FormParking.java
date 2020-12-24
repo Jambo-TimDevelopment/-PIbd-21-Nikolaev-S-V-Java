@@ -1,17 +1,17 @@
 package Forms;
 
+import FileFilter.OpenFileFilter;
 import Parking.ParkingCollection;
 import Parking.Parking;
 import Plane.APlane;
 import Plane.BasePlane;
 import Plane.IPlane;
-import Plane.RadarPlane;
 import Radar.IRadar;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Random;
+import java.io.File;
 import java.util.Stack;
 
 import javax.swing.*;
@@ -26,7 +26,7 @@ public class FormParking {
 
     private ParkingCollection collectionParking;
     private JList<String> jListOfParking;
-    private final DefaultListModel<String> listParking = new DefaultListModel<>();
+    private final DefaultListModel<String> listParkingModel = new DefaultListModel<>();
     private Stack<BasePlane> deletePlane = new Stack<>();
 
 
@@ -65,6 +65,10 @@ public class FormParking {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.add(createFileMenu());
+        frame.setJMenuBar(menuBar);
+
         panel.setBounds(0, 0, 700, 500);
         frame.getContentPane().add(panel);
         planeParking = new Parking(panel.getWidth(), panel.getHeight());
@@ -94,56 +98,54 @@ public class FormParking {
         collectionParking = new ParkingCollection(width, height);
 
         for (String key : collectionParking.keys()) {
-            listParking.addElement(key);
+            listParkingModel.addElement(key);
         }
-        jListOfParking = new JList<>(listParking);
+        jListOfParking = new JList<>(listParkingModel);
         jListOfParking.setLayoutOrientation(JList.VERTICAL);
         jListOfParking.setBounds(width + 20, 90, 130, 80);
         jListOfParking.addListSelectionListener(e -> {
             if (jListOfParking.getSelectedIndex() > -1) {
-                panel.setParking(collectionParking.get(listParking.get(jListOfParking.getSelectedIndex())));
+                panel.setParking(collectionParking.get(listParkingModel.get(jListOfParking.getSelectedIndex())));
                 panel.repaint();
             }
         });
         frame.add(jListOfParking);
 
-        btnTakeLastPlane = new JButton( "Получить последний самолет" );
+        btnTakeLastPlane = new JButton("Получить последний самолет");
         btnTakeLastPlane.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 if (deletePlane.size() <= 0) {
-                    JOptionPane.showMessageDialog( frame, "Нет улетевших самолетов", "Сообщение", JOptionPane.INFORMATION_MESSAGE );
-                }
-                else {
+                    JOptionPane.showMessageDialog(frame, "Нет улетевших самолетов", "Сообщение", JOptionPane.INFORMATION_MESSAGE);
+                } else {
                     BasePlane lastPlane = deletePlane.pop();
-                    EventQueue.invokeLater( () -> {
+                    EventQueue.invokeLater(() -> {
                                 FormPlane formPlane;
                                 try {
-                                    formPlane = new FormPlane( frame );
-                                    formPlane.frame.setVisible( true );
-                                    frame.setVisible( false );
+                                    formPlane = new FormPlane(frame);
+                                    formPlane.frame.setVisible(true);
+                                    frame.setVisible(false);
                                 } catch (Exception exp) {
                                     exp.printStackTrace();
                                     return;
                                 }
-                        formPlane.setPlane( lastPlane );
+                                formPlane.setPlane(lastPlane);
                             }
                     );
                     deletePlane.remove(lastPlane);
                 }
                 panel.repaint();
             }
-        } );
-        btnTakeLastPlane.setBounds( 735, 381, 215, 29 );
+        });
+        btnTakeLastPlane.setBounds(735, 381, 215, 29);
         frame.getContentPane().add(btnTakeLastPlane);
-
 
 
         JButton deleteStationButton = new JButton("Удалить парковку");
         deleteStationButton.addActionListener(e -> {
             if (jListOfParking.getSelectedIndex() > -1) {
-                if (JOptionPane.showConfirmDialog(frame, "Удалить парковку " + listParking.get(jListOfParking.getSelectedIndex()) + "?", "Удаление", JOptionPane.OK_CANCEL_OPTION)
+                if (JOptionPane.showConfirmDialog(frame, "Удалить парковку " + listParkingModel.get(jListOfParking.getSelectedIndex()) + "?", "Удаление", JOptionPane.OK_CANCEL_OPTION)
                         == JOptionPane.OK_OPTION) {
-                    collectionParking.DelParking(listParking.get(jListOfParking.getSelectedIndex()));
+                    collectionParking.DelParking(listParkingModel.get(jListOfParking.getSelectedIndex()));
                     ReloadParking();
                     panel.repaint();
                 }
@@ -166,7 +168,7 @@ public class FormParking {
 
             private void addPlane(APlane aPlane) {
                 if (aPlane != null && jListOfParking.getSelectedIndex() > -1) {
-                    if (collectionParking.get(listParking.get(jListOfParking.getSelectedIndex())).addPlane(aPlane)) {
+                    if (collectionParking.get(listParkingModel.get(jListOfParking.getSelectedIndex())).addPlane(aPlane)) {
                         panel.repaint();
                     } else {
                         JOptionPane.showMessageDialog(frame, "Самолет не удалось поставить");
@@ -176,40 +178,6 @@ public class FormParking {
         });
         btnParkingBasePlane.setBounds(720, 216, 250, 30);
         frame.getContentPane().add(btnParkingBasePlane);
-
-       /* JButton btnParkingRadarPlane = new JButton("Припарковать самолет с радаром");
-        btnParkingRadarPlane.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (jListOfParking.getSelectedIndex() > -1) {
-                    Color mainColor = JColorChooser.showDialog(frame, "Выберите цвет самолета", Color.BLUE);
-                    Color dopColor = JColorChooser.showDialog(frame, "Выберите цвет самолета", Color.BLUE);
-                    if (mainColor != null) {
-                        Random rnd = new Random();
-                        int maxSpeed = rnd.nextInt() % 200 + 100;
-                        int countRadar = rnd.nextInt() % 3 + 1;
-                        boolean antenna = true;
-                        BasePlane plane = new RadarPlane(
-                                maxSpeed,
-                                (float) (rnd.nextInt() % 1000 + 1000),
-                                mainColor,
-                                dopColor,
-                                countRadar,
-                                antenna);
-                        if (collectionParking.get(listParking.get(jListOfParking.getSelectedIndex())).addPlane(plane)) {
-                            panel.repaint();
-                        } else {
-                            JOptionPane.showMessageDialog(frame, "Парковка переполнена", "Сообщение", JOptionPane.INFORMATION_MESSAGE);
-                        }
-                        //panel.repaint();
-                    }
-                } else
-                    JOptionPane.showMessageDialog(frame, "Нет места для парковки", "Сообщение", JOptionPane.INFORMATION_MESSAGE);
-
-            }
-        });
-        btnParkingRadarPlane.setBounds(720, 253, 250, 30);
-        frame.getContentPane().add(btnParkingRadarPlane);
-        */
 
         textFieldGetPlace = new JTextField();
         textFieldGetPlace.setBounds(830, 299, 84, 26);
@@ -221,10 +189,10 @@ public class FormParking {
             public void actionPerformed(ActionEvent e) {
                 if (textFieldGetPlace.getText() != "") {
                     BasePlane plane = (BasePlane) collectionParking.
-                                    get(listParking.get(jListOfParking.getSelectedIndex())).
-                                    get(Integer.parseInt(textFieldGetPlace.getText()));
+                            get(listParkingModel.get(jListOfParking.getSelectedIndex())).
+                            get(Integer.parseInt(textFieldGetPlace.getText()));
 
-                    collectionParking.get(listParking.get(jListOfParking.getSelectedIndex())).
+                    collectionParking.get(listParkingModel.get(jListOfParking.getSelectedIndex())).
                             removePlane(Integer.parseInt(textFieldGetPlace.getText()));
 
                     if (plane != null) {
@@ -254,15 +222,124 @@ public class FormParking {
         int index = jListOfParking.getSelectedIndex();
 
         jListOfParking.setSelectedIndex(-1);
-        listParking.clear();
+        listParkingModel.clear();
         for (int i = 0; i < collectionParking.keys().length; i++) {
-            listParking.addElement(collectionParking.keys()[i]);
+            listParkingModel.addElement(collectionParking.keys()[i]);
         }
 
-        if (listParking.size() > 0 && (index == -1 || index >= listParking.size())) {
+        if (listParkingModel.size() > 0 && (index == -1 || index >= listParkingModel.size())) {
             jListOfParking.setSelectedIndex(0);
-        } else if (listParking.size() > 0 && index > -1 && index < listParking.size()) {
+        } else if (listParkingModel.size() > 0 && index > -1 && index < listParkingModel.size()) {
             jListOfParking.setSelectedIndex(index);
         }
     }
+
+
+    private void addPlane(APlane plane) {
+        if (plane != null && jListOfParking.getSelectedIndex() > -1) {
+            if (collectionParking.get(listParkingModel.get(jListOfParking.getSelectedIndex())).addPlane(plane)) {
+                panel.repaint();
+            } else {
+                JOptionPane.showMessageDialog(frame, "Машину не удалось поставить");
+            }
+        }
+    }
+
+    private JMenu createFileMenu() {
+        JMenu file = new JMenu("Файл");
+        JMenuItem save = new JMenuItem("Сохранить один аэропорт");
+        file.add(save);
+        JMenuItem saveAll = new JMenuItem("Сохранить всё");
+        file.add(saveAll);
+        JMenuItem load = new JMenuItem("Загрузить один аэропорт");
+        file.add(load);
+        JMenuItem loadAll = new JMenuItem("Загрузить всё");
+        file.add(loadAll);
+
+        saveAll.addActionListener(e ->
+        {
+            String filename = fileDialogSetup(FileDialog.SAVE);
+            if (filename == null) {
+                return;
+            }
+            if (collectionParking.SaveAllData(filename)) {
+                JOptionPane.showMessageDialog(frame, "Сохранение прошло успешно", "Инфо", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(frame, "При сохранении произошла ошибка", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        save.addActionListener(e ->
+        {
+            String filename = fileDialogSetup(FileDialog.SAVE);
+            if (filename == null) {
+                return;
+            }
+            if (jListOfParking.getSelectedIndex() == -1) {
+                JOptionPane.showMessageDialog(frame, "Укажите аэропорт, ", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (collectionParking.SaveData(filename, listParkingModel.get(jListOfParking.getSelectedIndex()))) {
+                JOptionPane.showMessageDialog(frame, "Сохранение прошло успешно", "Инфо", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(frame, "При сохранении произошла ошибка", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        loadAll.addActionListener(e ->
+        {
+            String filename = fileDialogSetup(FileDialog.LOAD);
+            if (filename == null) {
+                return;
+            }
+            if (collectionParking.LoadAllData(filename)) {
+                JOptionPane.showMessageDialog(frame, "Загрузилось успешно", "Инфо", JOptionPane.INFORMATION_MESSAGE);
+                ReloadParking();
+                if (listParkingModel.size() > 0) {
+                    panel.setParking(collectionParking.get(listParkingModel.get(0)));
+                    panel.repaint();
+                }
+            } else {
+                JOptionPane.showMessageDialog(frame, "При загрузке произошла ошибка", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        load.addActionListener(e ->
+        {
+            String filename = fileDialogSetup(FileDialog.LOAD);
+            if (filename == null) {
+                return;
+            }
+            if (collectionParking.LoadData(filename)) {
+                JOptionPane.showMessageDialog(frame, "Загрузка прошла успешно", "Инфо", JOptionPane.INFORMATION_MESSAGE);
+                listParkingModel.clear();
+                for (String key : collectionParking.keys()) {
+                    listParkingModel.addElement(key);
+                }
+                if (listParkingModel.size() > 0) {
+                    panel.setParking(collectionParking.get(listParkingModel.get(0)));
+                    panel.repaint();
+                }
+                panel.repaint();
+            } else {
+                JOptionPane.showMessageDialog(frame, "При загрузке произошла ошибка", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        return file;
+    }
+
+    private String fileDialogSetup(int type) {
+        File filename;
+        JFileChooser chooser = new JFileChooser();
+        chooser.addChoosableFileFilter(new OpenFileFilter(".txt"));
+        int returnVal;
+        if (type == 0) {
+            returnVal = chooser.showOpenDialog(frame);
+        } else {
+            returnVal = chooser.showSaveDialog(frame);
+        }
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            filename = chooser.getSelectedFile();
+            return filename.getAbsolutePath();
+        }
+        return null;
+    }
 }
+

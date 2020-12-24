@@ -99,4 +99,8 @@ public class Parking<T extends IPlane, V extends IRadar>  {
             _places.remove(index);
         }
     }
+
+    public void clear(){
+        _places.clear();
+    }
 }
